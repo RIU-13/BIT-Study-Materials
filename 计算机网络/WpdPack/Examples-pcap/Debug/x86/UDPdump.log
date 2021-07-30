@@ -1,0 +1,8 @@
+﻿D:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(491,5): warning MSB8028: 中间目录(D:\大三下\计算机网络\WpdPack\Examples-pcap\\Debug\x86\)包含从另一个项目(basic_dump.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
+cl : 命令行 warning D9035: “Gm”选项已否决，并将在将来的版本中移除
+  UDPdump.c
+D:\大三下\计算机网络\WpdPack\Examples-pcap\UDPdump\UDPdump.c(142,18): warning C4473: “fprintf”: 没有为格式字符串传递足够的参数
+D:\大三下\计算机网络\WpdPack\Examples-pcap\UDPdump\UDPdump.c(142,18): message : 占位符和其参数预计 1 可变参数，但提供的却是 0 参数
+D:\大三下\计算机网络\WpdPack\Examples-pcap\UDPdump\UDPdump.c(142,18): message : 缺失的可变参数 1 为格式字符串“%s”所需
+UDPdump.obj : warning LNK4075: 忽略“/EDITANDCONTINUE”(由于“/SAFESEH”规范)
+  UDPdump.vcxproj -> D:\大三下\计算机网络\WpdPack\Examples-pcap\Debug\x86\UDPdump.exe

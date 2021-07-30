@@ -1,0 +1,27 @@
+﻿  LINK : 已指定 /LTCG，但不需要生成代码；从链接命令行中移除 /LTCG 以提高链接器性能
+ddq.obj : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+kernel32.lib(kernel32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+user32.lib(user32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+gdi32.lib(gdi32.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+msvcrt.lib(msvcrt.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+winmm.lib(winmm.dll) : error LNK2026: 模块对于 SAFESEH 映像是不安全的。
+C:\D\大三下\汇编语言与接口技术\泡泡堂\DDQ_2\DDQ_2 (1) (5)\Release\DDQ.exe : fatal error LNK1281: 无法生成 SAFESEH 映像。

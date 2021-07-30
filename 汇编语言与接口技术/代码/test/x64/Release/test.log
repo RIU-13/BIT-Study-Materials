@@ -1,0 +1,97 @@
+﻿  Assembling test.asm...
+test.asm(1): error A2008: syntax error : .
+test.asm(2): error A2008: syntax error : .
+c:/masm32/include/windows.inc(9750): error A2008: syntax error : dword
+c:/masm32/include/windows.inc(10183): error A2008: syntax error : frame
+c:/masm32/include/windows.inc(16333): error A2008: syntax error : dword
+c:/masm32/include/windows.inc(18862): error A2008: syntax error : Frame
+test.asm(62): error A2008: syntax error : RtlZeroMemory
+test.asm(64): error A2070: invalid instruction operands
+test.asm(65): error A2070: invalid instruction operands
+test.asm(71): error A2008: syntax error : invoke
+test.asm(81): error A2008: syntax error : invoke
+test.asm(97): error A2008: syntax error : _imp__fopen
+test.asm(100): error A2008: syntax error : if
+test.asm(101): error A2008: syntax error : MessageBoxA
+test.asm(104): error A2008: syntax error : .
+test.asm(107): error A2008: syntax error : _imp__fopen
+test.asm(109): error A2008: syntax error : if
+test.asm(110): error A2008: syntax error : MessageBoxA
+test.asm(113): error A2008: syntax error : .
+test.asm(117): error A2008: syntax error : .
+test.asm(125): error A2008: syntax error : _imp__memset
+test.asm(126): error A2008: syntax error : _imp__memset
+test.asm(128): error A2008: syntax error : invoke
+test.asm(130): error A2008: syntax error : invoke
+test.asm(135): error A2008: syntax error : break
+test.asm(138): error A2044: invalid character in file
+test.asm(140): error A2008: syntax error : invoke
+test.asm(141): error A2008: syntax error : invoke
+test.asm(144): error A2008: syntax error : .
+test.asm(146): error A2044: invalid character in file
+test.asm(148): error A2008: syntax error : invoke
+test.asm(149): error A2008: syntax error : invoke
+test.asm(151): error A2008: syntax error : .
+test.asm(156): error A2044: invalid character in file
+test.asm(166): error A2008: syntax error : .
+test.asm(167): error A2008: syntax error : .
+test.asm(170): error A2008: syntax error : invoke
+test.asm(173): error A2008: syntax error : if
+test.asm(181): error A2008: syntax error : .
+test.asm(183): error A2008: syntax error : .
+test.asm(188): error A2008: syntax error : ebx
+test.asm(189): error A2012: PROC, MACRO, or macro repeat directive must precede LOCAL
+test.asm(190): error A2012: PROC, MACRO, or macro repeat directive must precede LOCAL
+test.asm(191): error A2012: PROC, MACRO, or macro repeat directive must precede LOCAL
+test.asm(192): error A2012: PROC, MACRO, or macro repeat directive must precede LOCAL
+test.asm(193): error A2012: PROC, MACRO, or macro repeat directive must precede LOCAL
+test.asm(194): error A2012: PROC, MACRO, or macro repeat directive must precede LOCAL
+test.asm(198): error A2008: syntax error : if
+test.asm(199): error A2008: syntax error : invoke
+test.asm(202): error A2008: syntax error : invoke
+test.asm(203): error A2008: syntax error : invoke
+test.asm(206): error A2008: syntax error : lstrlenA
+test.asm(207): error A2008: syntax error : TextOutA
+test.asm(208): error A2008: syntax error : lstrlenA
+test.asm(209): error A2008: syntax error : TextOutA
+test.asm(210): error A2008: syntax error : invoke
+test.asm(212): error A2008: syntax error : elseif
+test.asm(213): error A2008: syntax error : invoke
+test.asm(214): error A2008: syntax error : invoke
+test.asm(217): error A2008: syntax error : elseif
+test.asm(219): error A2008: syntax error : CreateWindowExA
+test.asm(225): error A2008: syntax error : CreateWindowExA
+test.asm(231): error A2008: syntax error : CreateWindowExA
+test.asm(237): error A2008: syntax error : CreateWindowExA
+test.asm(243): error A2008: syntax error : CreateWindowExA
+test.asm(249): error A2008: syntax error : elseif
+test.asm(251): error A2008: syntax error : if
+test.asm(252): error A2008: syntax error : OpenFileDirectory
+test.asm(253): error A2008: syntax error : SetDlgItemTextA
+test.asm(254): error A2008: syntax error : elseif
+test.asm(255): error A2008: syntax error : OpenFileDirectory
+test.asm(256): error A2008: syntax error : SetDlgItemTextA
+test.asm(257): error A2008: syntax error : elseif
+test.asm(259): error A2008: syntax error : CompareFile
+test.asm(261): error A2044: invalid character in file
+test.asm(264): error A2008: syntax error : .
+test.asm(265): error A2008: syntax error : if
+test.asm(266): error A2008: syntax error : MessageBoxA
+test.asm(268): error A2008: syntax error : .
+test.asm(270): error A2008: syntax error : pusha
+test.asm(271): error A2008: syntax error : _imp__strcat
+test.asm(272): error A2008: syntax error : popa
+test.asm(273): error A2045: missing angle bracket or brace in literal
+test.asm(276): error A2008: syntax error : pusha
+test.asm(277): error A2008: syntax error : invoke
+test.asm(278): error A2008: syntax error : popa
+test.asm(279): error A2008: syntax error : invoke
+test.asm(281): error A2008: syntax error : .
+test.asm(283): error A2008: syntax error : MessageBoxA
+test.asm(285): error A2008: syntax error : .
+test.asm(286): error A2008: syntax error : .
+test.asm(288): error A2008: syntax error : .
+test.asm(289): error A2008: syntax error : invoke
+test.asm(291): error A2008: syntax error : .
+test.asm(295): fatal error A1010: unmatched block nesting : _ProcWinMain
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations\masm.targets(70,5): error MSB3721: 命令“ml64.exe /c /nologo /Zi /Fo"x64\Release\test.obj" /I "C:\masm32\include" /W3 /errorReport:prompt  /Tatest.asm”已退出，返回代码为 1。

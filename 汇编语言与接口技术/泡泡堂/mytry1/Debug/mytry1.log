@@ -1,0 +1,4 @@
+﻿  Assembling main.asm...
+main.asm(208): warning A6004: procedure argument or local not referenced : hwnd
+main.asm(208): warning A6004: procedure argument or local not referenced : @framecount
+  mytry1.vcxproj -> C:\D\大三下\汇编语言与接口技术\泡泡堂\mytry1\Debug\mytry1.exe

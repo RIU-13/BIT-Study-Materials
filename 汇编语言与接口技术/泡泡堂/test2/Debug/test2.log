@@ -1,0 +1,13 @@
+﻿  Assembling main.asm...
+main.asm(102): error A2006: undefined symbol : CreateCompatibleDC
+main.asm(105): error A2006: undefined symbol : CreateCompatibleDC
+main.asm(108): error A2006: undefined symbol : CreateCompatibleBitmap
+main.asm(117): error A2006: undefined symbol : SelectObject
+main.asm(147): error A2006: undefined symbol : SelectObject
+main.asm(148): error A2006: undefined symbol : BitBlt
+main.asm(151): error A2006: undefined symbol : SelectObject
+main.asm(158): error A2006: undefined symbol : BitBlt
+main.asm(161): error A2006: undefined symbol : BitBlt
+main.asm(175): warning A6004: procedure argument or local not referenced : hwnd
+main.asm(175): warning A6004: procedure argument or local not referenced : @framecount
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations\masm.targets(70,5): error MSB3721: 命令“ml.exe /c /nologo /Zi /Fo"Debug\main.obj" /I "C:\masm32\include" /I "C:\masm32\include" /I "C:\download\ASM-game-scene-rough-simulation-master" /W3 /errorReport:prompt  /Tamain.asm”已退出，返回代码为 1。

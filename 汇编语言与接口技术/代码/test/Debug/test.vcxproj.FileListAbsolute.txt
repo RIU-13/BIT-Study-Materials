@@ -1,0 +1,2 @@
+D:\大三下\汇编语言与接口技术\代码\test\Debug\test.exe
+D:\大三下\汇编语言与接口技术\代码\test\Debug\test.pdb

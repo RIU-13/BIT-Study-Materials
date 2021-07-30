@@ -1,0 +1,8 @@
+﻿D:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(491,5): warning MSB8028: 中间目录(D:\大三下\计算机网络\WpdPack\Examples-pcap\\Debug\x86\)包含从另一个项目(basic_dump.vcxproj, basic_dump_ex.vcxproj, iflist.vcxproj, UDPdump.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
+cl : 命令行 warning D9035: “Gm”选项已否决，并将在将来的版本中移除
+  pcap_filter.c
+D:\大三下\计算机网络\WpdPack\Examples-pcap\pcap_filter\pcap_filter.c(119): warning C4701: 使用了可能未初始化的局部变量“fp”
+D:\大三下\计算机网络\WpdPack\Examples-pcap\pcap_filter\pcap_filter.c(119): warning C4703: 使用了可能未初始化的本地指针变量“fp”
+D:\大三下\计算机网络\WpdPack\Examples-pcap\pcap_filter\pcap_filter.c(162): warning C4701: 使用了可能未初始化的局部变量“dumpfile”
+D:\大三下\计算机网络\WpdPack\Examples-pcap\pcap_filter\pcap_filter.c(162): warning C4703: 使用了可能未初始化的本地指针变量“dumpfile”
+  pcap_filter.vcxproj -> D:\大三下\计算机网络\WpdPack\Examples-pcap\Debug\x86\pcap_filter.exe

@@ -1,0 +1,282 @@
+
+\chapter{实验目的}
+掌握 Windows 系统汇编程序的基本结构，掌握基本的汇编指令，用汇编实现程序的分支和循环等结构。熟练使用 Visual Studio 进行汇编程序
+的编写与调试；深入理解汇编数据类型之间的差异，学习调用 C 语言函数，综合提高汇编编程能力。
+同时从汇编的角度加强对C语言优化的理解。
+
+\chapter{实验环境}
+
+\begin{table}[htbp]
+    \linespread{2}
+    \zihao{3}
+    \centering
+    \setlength{\tabcolsep}{10mm}%7可随机设置，调整到适合自己的大小为止
+    \caption{环境信息}\label{环境信息}
+    \begin{tabular}{cc}
+        \hline
+        名称     & 详情                       \\ \hline
+        CPU      & Intel(R) Core(TM) i5-8265U \\
+        操作系统 & Windows 10 家庭中文版      \\
+        IDE      & Visual Studio 2019         \\
+        汇编器   & MASM32 V11                 \\ \hline
+    \end{tabular}
+\end{table}
+
+\chapter{实验三——大数相乘}
+
+\section{实验目的}
+% 这里插入一个参考文献，仅作参考
+要求实现两个十进制大整数的相乘（100 位以上），输出乘法运算的结果。
+
+\section{实验设计}
+
+\subsection{大数存储形式}
+采用DWORD数组以小端的形式存放大数，并在计算中可以令数组中的元素暂时大于10，
+在最后再统一进位，这样处理的优点如下：
+\begin{itemize}
+    \item 采用小端储存，可以直接从最低位进行逐位运算，不用逆序遍历
+    \item 采用小端储存，不用考虑越界的问题
+    \item 使用DWORD储存，运算中的中间值可以很大，最后统一进位，不用在相乘过程中频繁进位
+\end{itemize}
+
+\subsection{程序流程}
+程序流程如下：
+\begin{enumerate}
+    \item scanf读入两个大整数，以字符串的形式存放
+    \item 调用strlen得到两个字符串的长度
+    \item 将字符串形式的整数转化为数组形式
+    \item 将两个数组逐位相乘并加到结果数组中
+    \item 对结果数组进行进位处理，使每一个元素的大小属于[0, 9]
+    \item 得到结果数组的长度
+    \item 根据负号的个数判断是否需要输出’-‘
+    \item 输出结果
+\end{enumerate}
+
+
+\section{具体实现}
+该节介绍了代码中的部分核心算法和具体代码。
+
+\subsection{字符串转化为逆序数组}
+\begin{algorithm}[H]
+    \SetAlgoLined
+    \KwIn{存储字符串的变量首地址、字符串的长度}
+    \KwResult{数组的首地址}
+    $idx \leftarrow 0$ \;
+    \While{idx < len}{
+        \If {string[len - 1 - idx] == ’-’} {
+            negNum += 1 \;
+        }
+        numbers[idx] = string[len - 1 - idx] - '0'\;
+        idx++;
+    }
+
+    \caption{字符转无符号整数并逆序存储}
+\end{algorithm}
+
+即倒序遍历字符串，把每个字符减去'0'后便得到数字，并存在数组的相应位置，
+具体汇编代码如下，需要注意的是，字符减去'0'之后是一个8位的整数，如果要
+把这个数字放入DWORD数组中，则操作是先把这个八位的数字放入AL寄存器中，再
+把EAX寄存器中的值赋给DWORD数组中的元素。
+
+除此之外还要判断当前符号是否为’-‘号，如果是的话，需要使负号的个数加一，并
+提前退出循环。
+
+\begin{lstlisting}
+    str2RevNum proc stdcall USES edx ecx eax 
+                    string:ptr byte, 
+                    numbers:ptr dword, 
+                    len: dword
+    xor ah, ah
+    mov edx, string
+    mov ebx, numbers
+    ; i
+    mov ecx, len
+    sub ecx, 1
+    jmp L3
+L2:
+    ; body
+    mov al, [edx][ecx]
+
+    .if al == 45
+        add negNum, 1
+        ret
+    .endif  
+
+    ; - '0'
+    sub al, 30H
+
+    ; 补0
+    mov [ebx], eax
+    add ebx, 4
+
+    sub ecx, 1
+L3:
+    ; 循环终止条件判断
+    cmp ecx, 0
+    jns L2
+    ;invoke      strlen,     offset   
+
+    ret
+str2RevNum endp
+\end{lstlisting}
+
+\subsection{乘法}
+\begin{algorithm}[H]
+    \SetAlgoLined
+    \KwIn{两个数组的长度和首地址}
+    \KwResult{结果数组的首地址}
+    $i \leftarrow 0$ \;
+    $j \leftarrow 0$ \;
+    \For{i < len1}{
+        \For{j < len2} {
+            ans[i + j] += a[i] * b[j]
+        }
+    }
+    \caption{大数乘法}
+\end{algorithm}
+
+即使用二重循环遍历两个数组，将他们的乘积加在结果数组中下标为i + j的元素
+中。因为这里使用的是DWORD储存的乘积的和，而DWORD的最大范围是(1 << 32 - 1)
+所以基本不用考虑在运算中DWORD会溢出，故可以把进位操作留在最后完成,这样可以很大
+程度上加快程序的执行时间。具体代码如下：
+
+\begin{lstlisting}
+    multipy proc stdcall USES edi esi ecx edx ebx 
+                        nums1:ptr dword, len1:dword, 
+                        nums2:ptr dword, len2:dword, 
+                        res:ptr dword
+    mov edx, nums1
+    mov ebx, nums2
+    mov eax, res
+
+    mov esi, 0
+    jmp L2
+L5:
+    ; 第一层body
+    mov edi, 0
+    jmp L3
+L4:
+    ; 第二层body
+    mov ecx, [edx + esi * 4]
+    imul ecx, [ebx + edi * 4] ; a[i] * b[j]
+   
+    ; 计算下标
+    add edi, esi
+
+    ; res[i + j] += a[i] * b[j]
+    add [eax + edi * 4], ecx 
+
+    ; 还原edi
+    sub edi, esi
+
+    inc edi
+L3:
+    ; 第二层判断
+    cmp edi, len2
+    jl L4
+
+    inc esi
+L2:
+    ; 第一层判断
+    cmp esi, len1
+    jl  L5
+
+    ret
+multipy endp
+\end{lstlisting}
+
+
+\subsection{进位}
+\begin{algorithm}[H]
+    \SetAlgoLined
+    \KwIn{结果数组的首地址}
+    \KwResult{无}
+    $i \leftarrow 0$ \;
+    \For{i < len}{
+        \If {a[i] >= 10} {
+            a[i + 1] = a[i] / 10 \;
+            a[i] = a[i] \% 10 \; 
+        }
+    }
+    \caption{大数乘法}
+\end{algorithm}
+
+即顺序扫描结果数组，如果该元素大于10则对10做除法，商进位到下一位，余数作为这一位
+的数据。具体代码如下：
+
+\begin{lstlisting}
+    carry proc stdcall USES ebx edi edx res:ptr dword
+    local beforeLen, afterLen
+
+    ; 进位之前的长度
+    invoke      getResLen,   res
+    mov beforeLen, eax
+
+    mov ebx, res
+    mov edi, 0
+L3:
+    cmp edi, beforeLen
+    jnl  L2
+    
+    mov eax, [ebx + edi * 4]
+    xor edx, edx
+    mov ecx, 10
+    div ecx
+    ; eax 结果 ， edx 余数
+    mov [ebx + edi * 4], edx
+    add [ebx + edi * 4 + 4], eax
+
+    inc edi
+    jmp L3
+L2:
+    ; 进位之后长度
+    invoke      getResLen,   res
+    ret
+carry endp
+\end{lstlisting}
+
+
+\section{实验结果展示}
+输入多则测试用例，并与Python的计算结果相比较。
+
+\subsubsection{正数与正数相乘}
+输入两个9999999999999999999999999999999999999，并求乘积。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-20-11-20.png}
+    \caption{验证1}
+    \label{验证1}
+\end{figure}
+
+输入任意两个正数
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-20-16-08.png}
+    \caption{验证2}
+    \label{验证2}
+\end{figure}
+
+\subsubsection{正数与负数相乘}
+
+输入任意一个正数和负数。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-20-22-34.png}
+    \caption{验证3}
+    \label{验证3}
+\end{figure}
+
+
+\subsubsection{负数与负数相乘}
+
+输入任意两个负数。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-20-24-16.png}
+    \caption{验证4}
+    \label{验证4}
+\end{figure}
+

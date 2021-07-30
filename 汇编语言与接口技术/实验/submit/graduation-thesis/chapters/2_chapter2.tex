@@ -1,0 +1,309 @@
+\chapter{实验四——Windows界面风格的文本文件内容比对}
+
+\section{实验目的}
+实现一个windows界面风格的文本文件内容比较程序，如果两文件内容一样，输出相应提示；若两文件不一样，输出对应的行号。
+
+\section{实验设计}
+
+\subsection{GUI设计}
+本次实验设计的GUI如图所示：
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-23-43-45.png}
+    \caption{GUI样式}
+    \label{GUI样式}
+\end{figure}
+
+
+\subsection{设计思路}
+创建一个主窗口，之后进入无限消息循环处理模式，当有点击消息产生的时候，根据eax
+来判断点击的是哪个按钮，并做出相应的动作。
+
+比较文件的时候，先打开两个文件，并把他们的句柄保存，之后逐行读取文件并进行比较，
+最后弹出对话框显示文件的比较结果。
+
+\subsection{程序流程}
+\begin{enumerate}
+    \item 点击文件1选择按钮，弹出文件选择对话框
+    \item 选择文件1，记录文件1路径
+    \item 点击文件2选择按钮，弹出文件选择对话框
+    \item 选择文件2，记录文件2路径
+    \item 点击比较按钮
+    \item 分别从两个文件中读取两行
+          \iitem 如果两行长度均为0，跳转至7
+          \iitem 若有一行长度不为0，则进行比较，比较完成后跳转至6
+    \item 将结果数组中的数字转化为字符串
+    \item 弹出包含有比较结果的窗口
+\end{enumerate}
+
+
+\section{具体实现}
+该节介绍了代码中的部分核心算法和具体代码。
+
+\subsection{主窗口的创建过程}
+主窗口的创建流程如下：
+\begin{enumerate}
+    \item 得到应用程序的句柄
+    \item 初始化stWndClass
+    \item 指定窗口过程
+    \item 注册窗口
+    \item 建立窗口
+    \item 刷新窗口客户区
+    \item 进入消息获取和处理的循环
+\end{enumerate}
+
+具体代码如下：
+\begin{lstlisting}
+_WinMain proc  
+    local stWndClass:WNDCLASSEX 
+    local stMsg:MSG
+    invoke GetModuleHandle, NULL  ;得到应用程序的句柄
+    mov hInstance, eax
+    invoke RtlZeroMemory, addr stWndClass, \
+                          sizeof stWndClass
+
+    invoke LoadCursor, 0, IDC_ARROW
+    mov stWndClass.hCursor, eax
+    push hInstance
+    pop stWndClass.hInstance
+    mov stWndClass.cbSize, sizeof WNDCLASSEX
+    mov stWndClass.style, CS_HREDRAW or CS_VREDRAW
+    ; 指定窗口过程
+    mov stWndClass.lpfnWndProc, offset _ProcWinMain
+    mov stWndClass.hbrBackground, COLOR_WINDOW+1
+    mov stWndClass.lpszClassName, offset szClassName
+    ; 注册窗口
+    invoke RegisterClassEx, addr stWndClass
+
+    invoke CreateWindowEx, WS_EX_CLIENTEDGE,\
+                           offset szClassName, \
+                           offset szCaptionMain,\  
+                           WS_OVERLAPPEDWINDOW, \
+                           100, 100, 500, 200,\
+                           NULL, NULL, hInstance, NULL
+    mov hWinMain, eax  ;句柄放入hWinMain
+    invoke ShowWindow, hWinMain, SW_SHOWNORMAL  
+    ;刷新窗口客户区
+    invoke UpdateWindow, hWinMain  
+
+    .while TRUE  ;消息获取和处理的循环
+        invoke GetMessage, addr stMsg, NULL, 0, 0
+        .break .if eax==0  ;退出消息
+        invoke TranslateMessage, addr stMsg  
+        invoke DispatchMessage, addr stMsg
+    .endw
+    ret
+_WinMain endp
+
+\end{lstlisting}
+
+\subsection{窗口过程函数}
+
+窗口过程函数指定了窗口针对不同事件的处理方式。本次实验中事件的类型如下：
+
+\begin{enumerate}
+    \item WM\_CREATE：窗口创建信号, 绘制窗口的按钮以及文本框组件
+    \item WM\_COMMAND：按钮点击信号，根据不同的句柄来调用不同的处理函数
+        \iitem eax == 1: 弹出文件浏览窗口，选择后改变textEdit1中的内容
+        \iitem eax == 3: 弹出文件浏览窗口，选择后改变textEdit2中的内容   
+        \iitem eax == 5: 调用比较函数，并弹出新的对话框展示比较的内容   
+    \item WM\_CLOSE：窗口关闭信号，销毁窗口
+\end{enumerate}
+
+
+\subsection{文件浏览并选择}
+本次实验中，通过调用Windows的系统API中的SHBrowseForFolder函数来实现浏览文件
+并选择文件。
+
+调用流程如下：
+\begin{enumerate}
+    \item 创建BROWSEINFO结构体并初始化
+    \item 设置BROWSEINFO\.ulFlags为BIF\_BROWSEINCLUDEFILES，使其可以显示文件
+    \item 调用SHBrowseForFolder
+    \item 判断返回值eax的大小
+        \iitem eax == 0, 说明未选择文件，直接返回
+        \iitem eax != 0, 说明选择了文件，跳转至5
+    \item 调用SHGetPathFromIDList得到完整的文件名
+    \item 调用CoTaskMemFree释放空间
+\end{enumerate}
+
+\subsection{读取一行}
+
+通过传入的句柄，从文件中读取一行到缓冲区中，流程如下：
+\begin{enumerate}
+    \item 调用ReadFile函数，并设置每次只读取一个字符
+    \item 判断读取的字符长度是否为0
+        \iitem 若为0，跳转至4
+        \iitem 若不是，将该字符添加到缓冲区
+    \item 判断该字符是否为换行符
+        \iitem 若是换行符，跳转至4
+        \iitem 若不是，跳转至1
+    \item 在缓冲区中添加'0'作为字符串结束符
+    \item 调用lstrlen得到缓冲区字符串长度
+\end{enumerate}
+
+具体代码如下：
+\begin{lstlisting}
+ReadLine proc stdcall uses ebx, 
+                      fileHand: HANDLE, 
+                      lpLineBuf: ptr byte
+    ; 读完文件 eax为0
+    LOCAL br     :DWORD
+    local char   :BYTE
+    mov ebx, lpLineBuf
+
+L2:
+    invoke ReadFile,fileHand,addr char,1,ADDR br,NULL
+    cmp     br, 0
+    je      L1
+
+    mov     al, char  
+    mov     [ebx], al
+    inc     ebx
+    
+    cmp     char, 10
+    je      L1
+    
+    jmp     L2
+L1:
+    mov     al, 0
+    mov     [ebx], al
+
+    invoke  lstrlen, lpLineBuf
+    ret     
+ReadLine endp
+
+\end{lstlisting}
+
+\subsection{文件比较}
+
+通过传入的两个文件路径，对两个文件进行比较，当内容不同时，把当前的
+行号记录在数组中，流程如下：
+
+\begin{enumerate}
+    \item 调用CreateFile来得到两个文件的句柄
+    \item 从两个文件中分别读取一行
+        \iitem 两行的长度都是0，则退出
+        \iitem 如果有一行的长度不为0
+            \iiitem 调用lstrcmp进行比较
+            \iiitem 若结果不同，将当前行数记录在结果数组中
+            \iiitem 跳转至2
+\end{enumerate}
+
+具体代码如下：
+\begin{lstlisting}
+Compare proc stdcall uses ebx eax edx 
+                     lpFilePath1: ptr byte, 
+                     lpFilePath2: ptr byte
+    LOCAL br     :DWORD
+    LOCAL len    :DWORD
+    LOCAL lineLen1, lineLen2:DWORD
+    LOCAL lineNum:DWORD
+
+    mov   eax, 0
+    mov   lineNum, eax
+
+    mov   ebx, offset diffLines
+    invoke CreateFile, lpFilePath1,
+                    GENERIC_READ,
+                    FILE_SHARE_READ,
+                    NULL,OPEN_EXISTING,
+                    FILE_ATTRIBUTE_NORMAL,
+                    NULL
+    mov fileHandle1, eax
+    
+    invoke CreateFile, lpFilePath2,
+                GENERIC_READ,
+                FILE_SHARE_READ,
+                NULL,OPEN_EXISTING,
+                FILE_ATTRIBUTE_NORMAL,
+                NULL
+    mov fileHandle2, eax
+
+    .WHILE  TRUE
+        inc lineNum
+
+        invoke  ReadLine, fileHandle1,\
+                          offset lineBuf1
+        mov     lineLen1, eax
+
+        invoke  ReadLine, fileHandle2,\
+                          offset lineBuf2
+        mov     lineLen2, eax
+
+        ; 两个line长度都是0就退出
+        add     eax, lineLen1
+        .BREAK  .IF  eax == 0
+
+        invoke  lstrcmp, offset lineBuf1,\
+                         offset lineBuf2
+
+        .IF eax != 0
+            mov     eax, lineNum
+            mov     [ebx], eax
+            add     ebx, 4
+
+            inc     diffNum
+        .ENDIF
+    .ENDW
+
+    ret
+Compare endp
+\end{lstlisting}
+
+\section{实验结果展示}
+
+\subsubsection{比较两个相同的文件}
+
+1. 选取文件test.txt作为文件1
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-23-46-18.png}
+    \caption{选择文件test.txt作为文件1}
+    \label{选择文件test.txt作为文件1}
+\end{figure}
+
+
+2. 选取文件test.txt作为文件2
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-23-47-32.png}
+    \caption{选择文件test.txt作为文件2}
+    \label{选择文件test.txt作为文件2}
+\end{figure}
+
+3. 比较
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-23-48-36.png}
+    \caption{显示文件相同}
+    \label{显示文件相同}
+\end{figure}
+
+\subsubsection{比较两个不同的文件}
+
+分别选取test.txt, test1.txt作为文件1和文件2，并进行比较，选择完之后如图：
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-23-51-04.png}
+    \caption{选择两个不同的文件}
+    \label{选择两个不同的文件}
+\end{figure}
+
+两个文件的内容分别如下，不同的地方已用红线标出：
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-23-54-34.png}
+    \caption{两个文件的内容}
+    \label{两个文件的内容}
+\end{figure}
+
+
+比较结果如下：
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-04-23-55-54.png}
+    \caption{不同的行数}
+    \label{不同的行数}
+\end{figure}
+

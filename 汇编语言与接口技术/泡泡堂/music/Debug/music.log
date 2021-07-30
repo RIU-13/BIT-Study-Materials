@@ -1,0 +1,4 @@
+﻿  Assembling music.asm...
+music.asm(70): warning A6001: no return from procedure
+music.asm(70): warning A6004: procedure argument or local not referenced : @dwThreadID
+  music.vcxproj -> C:\D\大三下\汇编语言与接口技术\泡泡堂\music\Debug\music.exe

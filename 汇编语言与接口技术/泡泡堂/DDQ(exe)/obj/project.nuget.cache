@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "uZ4SW7SNVO3HbMvhKPty8Ylv5jRhNo1AxpAm0/ddOII669DOuIbmgg/hWWEkVpNT6wWqfHqdkUhJBZwq0+KQPA==",
+  "success": true,
+  "projectFilePath": "C:\\D\\大三下\\汇编语言与接口技术\\泡泡堂\\DDQ(exe)\\DDQ(exe).wapproj",
+  "expectedPackageFiles": [
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages\\microsoft.windows.sdk.buildtools\\10.0.19041.8\\microsoft.windows.sdk.buildtools.10.0.19041.8.nupkg.sha512"
+  ],
+  "logs": []
+}

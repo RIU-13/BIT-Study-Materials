@@ -1,0 +1,332 @@
+\chapter{实验五——C语言多重循环反汇编分析}
+
+\section{实验目的}
+C语言编写多重循环程序（大于3重），查看其反汇编码，分析各条语句功能（分析情况需要写入实验报告），并采用汇编语言重写相同功能程序。
+
+\section{实验步骤}
+\begin{enumerate}
+    \item 编写C语言四重循环的代码
+    \item 在Visual Studio 2019中查看其反汇编代码并调试
+    \item 分析反汇编代码各条语句的功能
+    \item 采用MASM编写具有同样功能的代码
+\end{enumerate}
+
+\section{多重循环的C语言源码}
+该程序作用为，从一个数组中选取四个数(可以相同)，并计算这四个数
+的和，输出这个数组中所有可能的和。
+
+\begin{lstlisting}[language=C]
+#include <stdio.h>
+
+int a[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 ,9 };
+
+int main() {
+    int n = 10;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < n; k++) {
+                for (int m = 0; m < n; m++) {
+                    int tmp = a[i] + a[j] + a[k] + a[m];
+                    printf("%d\n", tmp);
+                }
+            }
+        }
+    }
+}
+\end{lstlisting}
+
+\section{反汇编代码分析}
+采用Visual Studio 2019自带的反汇编查看功能，对该程序生成的
+反汇编码进行查看并分析各条语句的功能。
+
+\subsection{初始化}
+
+具体汇编码如下：
+\begin{lstlisting}
+005F4E90  push        ebp  
+005F4E91  mov         ebp,esp  
+005F4E93  sub         esp,108h  
+005F4E99  push        ebx  
+005F4E9A  push        esi  
+005F4E9B  push        edi  
+005F4E9C  lea         edi,[ebp-108h]  
+005F4EA2  mov         ecx,42h  
+005F4EA7  mov         eax,0CCCCCCCCh  
+005F4EAC  rep stos    dword ptr es:[edi]  
+005F4EAE  mov         ecx,offset _7E81AEF5_main@c (05FC003h)  
+005F4EB3  call        @__CheckForDebuggerJustMyCode@4 (05F1208h)  
+\end{lstlisting}
+
+对上述汇编代码进行分析，进入main函数之后主要的初始化的流程如下：
+\begin{enumerate}
+    \item push        ebp: 保存调用者的栈指针
+    \item mov         ebp,esp：使栈指针与帧指针的值相同
+    \item sub         esp,108h：为当前函数开辟局部变量的空间, 这一步同上一步共同建立了一个新的栈帧
+    \item line4~line6: 因为C语言函数中不允许修改这三个寄存器的值，因此把他们保存在堆中
+    \item lea         edi,[ebp-108h]: 把栈帧的最低地址复制给edi
+    \item line8~line10: 对栈帧中未初始化的数据进行初始化，其中ecx的值为DWORD的数量，eax的值为要储存的值，0CCCCCCCCh即代表未被初始化的值。rep指令的目的是重复其上面的指令，ECX的值是重复的次数.
+\end{enumerate}
+
+\subsection{定义局部变量并赋值}
+
+具体汇编码如下：
+\begin{lstlisting}
+    ;int n = 10;
+005F4EB8  mov         dword ptr [n],0Ah  
+\end{lstlisting}
+
+其中[n]代表着直接寻址。
+
+\subsection{循环体}
+
+按照编译原理中的基本块划分的思想，可以把这段代码做如下划分：
+\begin{lstlisting}
+
+    ;for (int i = 0; i < n; i++) {
+005F4EBF  mov         dword ptr [ebp-14h],0     <——
+005F4EC6  jmp         main+41h (05F4ED1h)  
+
+\end{lstlisting}
+
+\begin{lstlisting}
+
+005F4EC8  mov         eax,dword ptr [ebp-14h]   <——
+005F4ECB  add         eax,1  
+005F4ECE  mov         dword ptr [ebp-14h],eax  
+
+\end{lstlisting}
+
+\begin{lstlisting}
+    005F4ED1  mov         eax,dword ptr [ebp-14h]   <——
+    005F4ED4  cmp         eax,dword ptr [n]  
+    005F4ED7  jge         main+0E5h (05F4F75h)  
+            ;for (int j = 0; j < n; j++) {
+\end{lstlisting}
+
+\begin{lstlisting}
+    005F4EDD  mov         dword ptr [ebp-20h],0     <——
+    005F4EE4  jmp         main+5Fh (05F4EEFh)  
+\end{lstlisting}
+
+\begin{lstlisting}
+    005F4EE6  mov         eax,dword ptr [ebp-20h]   <——
+    005F4EE9  add         eax,1  
+    005F4EEC  mov         dword ptr [ebp-20h],eax 
+\end{lstlisting}
+
+\begin{lstlisting}
+    005F4EEF  mov         eax,dword ptr [ebp-20h]   <——
+    005F4EF2  cmp         eax,dword ptr [n]  
+    005F4EF5  jge         main+0E0h (05F4F70h)  
+                ;for (int k = 0; k < n; k++) {
+\end{lstlisting}
+
+\begin{lstlisting}
+    005F4EF7  mov         dword ptr [ebp-2Ch],0     <——
+                ;for (int k = 0; k < n; k++) {
+    005F4EFE  jmp         main+79h (05F4F09h)  
+\end{lstlisting}
+
+\begin{lstlisting}
+    005F4F00  mov         eax,dword ptr [ebp-2Ch]   <——
+    005F4F03  add         eax,1  
+    005F4F06  mov         dword ptr [ebp-2Ch],eax  
+\end{lstlisting}
+
+\begin{lstlisting}
+    005F4F09  mov         eax,dword ptr [ebp-2Ch]   <——
+    005F4F0C  cmp         eax,dword ptr [n]  
+    005F4F0F  jge         main+0DBh (05F4F6Bh)  
+                    ;for (int m = 0; m < n; m++) {
+\end{lstlisting}
+
+\begin{lstlisting}
+    005F4F11  mov         dword ptr [ebp-38h],0     <——
+    005F4F18  jmp         main+93h (05F4F23h)  
+\end{lstlisting}
+
+
+\begin{lstlisting}
+    005F4F1A  mov         eax,dword ptr [ebp-38h]   <——
+    005F4F1D  add         eax,1  
+    005F4F20  mov         dword ptr [ebp-38h],eax  
+\end{lstlisting}
+
+
+\begin{lstlisting}
+    005F4F23  mov         eax,dword ptr [ebp-38h]   <——
+    005F4F26  cmp         eax,dword ptr [n]  
+    005F4F29  jge         main+0D9h (05F4F69h)  
+                        ;int tmp = a[i] + a[j] + a[k] + a[m];
+\end{lstlisting}
+
+
+\begin{lstlisting}
+    005F4F2B  mov         eax,dword ptr [ebp-14h]   <——
+                        ;int tmp = a[i] + a[j] + a[k] + a[m];
+    005F4F2E  mov         ecx,dword ptr a (05FA000h)[eax*4]  
+    005F4F35  mov         edx,dword ptr [ebp-20h]  
+    005F4F38  add         ecx,dword ptr a (05FA000h)[edx*4]  
+    005F4F3F  mov         eax,dword ptr [ebp-2Ch]  
+    005F4F42  add         ecx,dword ptr a (05FA000h)[eax*4]  
+    005F4F49  mov         edx,dword ptr [ebp-38h]  
+    005F4F4C  add         ecx,dword ptr a (05FA000h)[edx*4]  
+    005F4F53  mov         dword ptr [ebp-44h],ecx  
+                        ;printf("%d\n", tmp);
+    005F4F56  mov         eax,dword ptr [ebp-44h]  
+    005F4F59  push        eax  
+    005F4F5A  push        offset string "%d\n" (05F7BCCh)  
+    005F4F5F  call        _printf (05F1375h)  
+    005F4F64  add         esp,8  
+                    ;}
+    005F4F67  jmp         main+8Ah (05F4F1Ah)  
+                ;}
+\end{lstlisting}
+
+
+\begin{lstlisting}
+    005F4F69  jmp         main+70h (05F4F00h)     <——
+            ;}
+\end{lstlisting}
+
+
+\begin{lstlisting}
+    005F4F6B  jmp         main+56h (05F4EE6h)     <——
+        ;}
+\end{lstlisting}
+
+
+\begin{lstlisting}
+    005F4F70  jmp         main+38h (05F4EC8h)     <——
+    ;}
+\end{lstlisting}
+
+
+\begin{lstlisting}
+    005F4F75  xor         eax,eax                 <——
+    005F4F77  pop         edi  
+    005F4F78  pop         esi  
+    005F4F79  pop         ebx  
+    005F4F7A  add         esp,108h  
+    005F4F80  cmp         ebp,esp  
+    005F4F82  call        __RTC_CheckEsp (05F1212h)  
+    005F4F87  mov         esp,ebp  
+    005F4F89  pop         ebp  
+    005F4F8A  ret
+\end{lstlisting}
+
+根据以上基本块的划分，可以画出程序的流程图如下：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.8\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/tmp.pdf}
+    \caption{循环体流程图}
+    \label{循环体流程图}
+\end{figure}
+
+\section{采用MASM32重写该程序}
+
+根据上述的程序流程图，在汇编中定义与其对应的代码块和跳转即可重写该
+程序。与反汇编的代码的差别如下：
+\begin{enumerate}
+    \item 使用eax储存n，避免每次比较都需要执行mov eax, n
+\end{enumerate}
+
+部分关键代码如下：
+
+\begin{lstlisting}
+main proc    
+    LOCAL i, j, k, m, tmp:DWORD
+    mov eax, n
+
+L0:
+    mov i, 0
+    jmp L2
+
+L1:
+    inc i
+
+L2:
+    cmp i, eax
+    jge    L13    
+
+L3:
+    mov j, 0
+    jmp L5
+
+L4:
+    inc j
+
+L5:
+    cmp j, eax
+    jge L1
+
+L6:
+    mov k, 0
+    jmp L8
+
+L7:
+    inc k
+
+L8:
+    cmp k, eax
+    jge L4
+
+L9:
+    mov m, 0
+    jmp L11
+
+L10:
+    inc m
+
+L11:
+    cmp m, eax
+    jge    L7
+
+L12:
+    mov esi, i
+    mov ecx, numbers[esi * 4]
+    
+    mov esi, j
+    add ecx, numbers[esi * 4]
+
+    mov esi, k
+    add ecx, numbers[esi * 4]
+    
+    mov esi, m
+    add ecx, numbers[esi * 4]
+
+    mov tmp, ecx
+
+    push eax
+    invoke    printf, offset    string_d, tmp
+    pop eax
+
+    jmp L10
+
+L13:
+    ret    
+main endp    
+\end{lstlisting}
+
+\section{实验结果展示}
+
+由于四次循环会产生$n^4$个输出，因此本次测试让数组的长度为4，即
+numbers = $\left\{1, 2, 3, 4\right\}$, 运行结果如下：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-05-15-11-24.png}
+    \caption{多重循环实验结果-1}
+    \label{多重循环实验结果-1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width= 0.9\textwidth]{e:/CourseProject/Assembly/bigNumberMul/assets/2020-06-05-15-12-04.png}
+    \caption{多重循环实验结果-2}
+    \label{多重循环实验结果-2}
+\end{figure}
+
+共64个输出，最小的为1+1+1+1=4，最大的为4+4+4+4=16，与C语言程序的
+运行结果一致。

@@ -1,0 +1,5 @@
+﻿  Assembling ddq.asm...
+ddq.asm(855): warning A6004: procedure argument or local not referenced : hwnd
+ddq.asm(855): warning A6004: procedure argument or local not referenced : @bombcount
+ddq.asm(855): warning A6004: procedure argument or local not referenced : @bombcoord
+  DDQ.vcxproj -> C:\D\大三下\汇编语言与接口技术\泡泡堂\DDQ_2\Debug\DDQ.exe

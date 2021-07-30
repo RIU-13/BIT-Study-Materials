@@ -1,0 +1,3 @@
+﻿  Assembling test.asm...
+test.asm(5): fatal error A1000: cannot open file : windows.inc
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\BuildCustomizations\masm.targets(70,5): error MSB3721: 命令“ml.exe /c /nologo /Zi /Fo"Release\test.obj" /W3 /errorReport:prompt  /Tatest.asm”已退出，返回代码为 1。
